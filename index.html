@@ -116,8 +116,8 @@
                 isiDropdownUniversitas(dataMentahSistem);
 
                 // Hitung Statistik Utama (Berlaku global dari data asli)
-                const totalAktif = dataMentahSistem.filter(item => item.status?.toLowerCase() === 'aktif').length;
-                document.getElementById('stat-sedang pkl').innerText = totalAktif + " Orang";
+                const totalAktif = dataMentahSistem.filter(item => item.status?.toLowerCase() === 'Sedang PKL').length;
+                document.getElementById('stat-Sedang PKL').innerText = totalAktif + " Orang";
 
                 const daftarUniv = [...new Set(dataMentahSistem.map(item => item.universitas))].filter(Boolean);
                 document.getElementById('stat-univ').innerText = daftarUniv.length + " Kampus";
@@ -209,7 +209,7 @@
             }
 
             data.forEach((mhs, index) => {
-                const badgeColor = mhs.status?.toLowerCase() === 'aktif' ? 'bg-green-100 text-green-800' : 'bg-slate-100 text-slate-800';
+                const badgeColor = mhs.status?.toLowerCase() === 'Sedang PKL' ? 'bg-green-100 text-green-800' : 'bg-slate-100 text-slate-800';
 
                 // Membuat element baris tabel agar aman dipasangi event click listener
                 const tr = document.createElement('tr');

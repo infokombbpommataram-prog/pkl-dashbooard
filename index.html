@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Monitoring PKL</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+<body class="bg-slate-50 min-h-screen text-slate-800 font-sans">
+
+    <div class="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
+        <div class="mb-8 border-b border-slate-200 pb-5">
+            <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Dashboard Real-Time Mahasiswa PKL</h1>
+            <p class="text-sm text-slate-500 mt-1">Sistem informasi monitoring kehadiran dan status penempatan mahasiswa PKL.</p>
+        </div>
+
+        <div class="grid grid-cols-1 gap-5 sm:grid-cols-3 mb-8">
+            <div class="bg-white overflow-hidden shadow rounded-lg border border-slate-200">
+                <div class="p-5">
+                    <div class="text-sm font-medium text-slate-500 truncate">Total PKL Aktif</div>
+                    <div id="stat-aktif" class="mt-1 text-3xl font-semibold text-indigo-600">Loading...</div>
+                </div>
+            </div>
+            <div class="bg-white overflow-hidden shadow rounded-lg border border-slate-200">
+                <div class="p-5">
+                    <div class="text-sm font-medium text-slate-500 truncate">Asal Universitas</div>
+                    <div id="stat-univ" class="mt-1 text-3xl font-semibold text-emerald-600">Loading...</div>
+                </div>
+            </div>
+            <div class="bg-white overflow-hidden shadow rounded-lg border border-slate-200">
+                <div class="p-5">
+                    <div class="text-sm font-medium text-slate-500 truncate">Permohonan Diterima</div>
+                    <div id="stat-diterima" class="mt-1 text-3xl font-semibold text-amber-600">Loading...</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white shadow rounded-lg border border-slate-200 overflow-hidden">
+            <div class="p-5 border-b border-slate-200 bg-slate-50">
+                <h2 class="text-lg font-bold text-slate-700">Daftar Mahasiswa & Riwayat Penempatan</h2>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-slate-200 text-left">
+                    <thead class="bg-slate-50 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                        <tr>
+                            <th class="px-6 py-3">Nama / NIM</th>
+                            <th class="px-6 py-3">Asal Universitas</th>
+                            <th class="px-6 py-3">Prodi / Fakultas</th>
+                            <th class="px-6 py-3">Periode</th>
+                            <th class="px-6 py-3">Penempatan</th>
+                            <th class="px-6 py-3">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabel-body-pkl" class="bg-white divide-y divide-slate-200 text-sm">
+                        <tr>
+                            <td colspan="6" class="px-6 py-10 text-center text-slate-400">Sedang memuat data dari spreadsheet...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // MASUKKAN URL GOOGLE APPS SCRIPT ANDA DI SINI
+        const WEBA_APP_URL = "https://script.google.com/macros/s/AKfycbwX_iYk6t3h2HjRN0w_eRCbbRTSSIp9XqxNsrpCYndSwP6eESJrHX0mRsirSDv-sV46WQ/exec";
+
+        async function fetchDashboardData() {
+            try {
+                const response = await fetch(WEBA_APP_URL);
+                const data = await response.json();
+                
+                // --- PROSES DATA UNTUK STATISTIK ---
+                // 1. Hitung Status Aktif
+                const totalAktif = data.filter(item => item.status.toLowerCase() === 'aktif').length;
+                document.getElementById('stat-aktif').innerText = totalAktif + " Orang";
+
+                // 2. Hitung Unik Universitas
+                const daftarUniv = [...new Set(data.map(item => item.universitas))].filter(Boolean);
+                document.getElementById('stat-univ').innerText = daftarUniv.length + " Kampus";
+
+                // 3. Hitung Status Permohonan yang Diterima
+                const totalDiterima = data.filter(item => item.statusPermohonan.toLowerCase() === 'diterima').length;
+                document.getElementById('stat-diterima').innerText = totalDiterima + " Berkas";
+
+                // --- RENDERING TABEL ---
+                const tbody = document.getElementById('tabel-body-pkl');
+                tbody.innerHTML = ""; // Kosongkan tabel loading
+
+                if (data.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-10 text-center text-slate-400">Tidak ada data mahasiswa.</td></tr>`;
+                    return;
+                }
+
+                data.forEach(mhs => {
+                    // Penentuan warna badge berdasarkan status
+                    const badgeColor = mhs.status.toLowerCase() === 'aktif' 
+                        ? 'bg-green-100 text-green-800' 
+                        : 'bg-slate-100 text-slate-800';
+
+                    const rowHTML = `
+                        <tr class="hover:bg-slate-50 transition-colors">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="font-semibold text-slate-900">${mhs.nama}</div>
+                                <div class="text-xs text-slate-400">${mhs.nim || '-'}</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-slate-600 font-medium">
+                                ${mhs.universitas} <span class="text-xs text-slate-400">(${mhs.jenisPkl})</span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-slate-700">${mhs.prodi}</div>
+                                <div class="text-xs text-slate-400">${mhs.fakultas}</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-xs text-slate-600">
+                                <div>${mhs.startDate}</div>
+                                <div class="text-slate-400">s/d ${mhs.endDate}</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-slate-700">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium bg-blue-50 text-blue-700 border border-blue-100">
+                                    ${mhs.penempatan || 'Belum Ditentukan'}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2.5 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${badgeColor}">
+                                    ${mhs.status}
+                                </span>
+                            </td>
+                        </tr>
+                    `;
+                    tbody.innerHTML += rowHTML;
+                });
+
+            } catch (error) {
+                console.error("Gagal memuat data dashboard:", error);
+                document.getElementById('tabel-body-pkl').innerHTML = `
+                    <tr><td colspan="6" class="px-6 py-10 text-center text-red-500 font-medium">Gagal memuat data. Periksa konfigurasi API Anda.</td></tr>
+                `;
+            }
+        }
+
+        // Ambil data pertama kali saat web dibuka
+        fetchDashboardData();
+
+        // Refresh otomatis setiap 30 detik (30000 milidetik)
+        setInterval(fetchDashboardData, 30000);
+    </script>
+</body>
+</html>

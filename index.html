@@ -4,20 +4,32 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Monitoring PKL</title>
+    <!-- Menggunakan Tailwind CSS untuk desain modern & clean -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 </head>
 <body class="bg-slate-50 min-h-screen text-slate-800 font-sans">
 
     <div class="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
+        <!-- Header Website -->
         <div class="mb-8 border-b border-slate-200 pb-5">
             <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Dashboard Real-Time Mahasiswa PKL</h1>
             <p class="text-sm text-slate-500 mt-1">Sistem informasi monitoring kehadiran, penempatan, dan detail mahasiswa PKL.</p>
         </div>
 
+        <!-- Kartu Statistik Utama -->
         <div class="grid grid-cols-1 gap-5 sm:grid-cols-3 mb-8">
             <div class="bg-white overflow-hidden shadow rounded-lg border border-slate-200">
                 <div class="p-5">
-                    <div class="text-sm font-medium text-slate-500 truncate">Total Sedang PKL</div>
+                    <div class="flex justify-between items-center">
+                        <div class="text-sm font-medium text-slate-500 truncate">Total PKL Berdasarkan Tahun</div>
+                        <!-- Fitur 1: Pilihan Tahun -->
+                        <select id="stat-year-select" onchange="hitungStatistikTahun()" class="text-xs bg-slate-100 border border-slate-300 rounded px-2 py-1 font-semibold text-slate-700 focus:outline-none">
+                            <option value="all">Semua Tahun</option>
+                            <option value="2025">2025</option>
+                            <option value="2026">2026</option>
+                            <option value="2027">2027</option>
+                        </select>
+                    </div>
                     <div id="stat-aktif" class="mt-1 text-3xl font-semibold text-indigo-600 border-none">0 Orang</div>
                 </div>
             </div>
@@ -35,30 +47,50 @@
             </div>
         </div>
 
+        <!-- Panel Pencarian & Filter Modern -->
         <div class="bg-white shadow rounded-lg border border-slate-200 p-5 mb-6">
-            <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider mb-4">Fitur Pencarian & Penyaringan</h3>
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div>
+            <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider mb-4">Fitur Pencarian & Penyaringan Multi-Parameter</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                <!-- Search Nama / NIM -->
+                <div class="md:col-span-2 lg:col-span-2">
                     <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Cari Nama / NIM</label>
                     <input type="text" id="search-input" oninput="prosesFilterData()" placeholder="Ketik nama atau NIM..." class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white">
                 </div>
+                <!-- Fitur 2: Filter Keaktifan Real-Time -->
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Status Keaktifan</label>
+                    <select id="filter-status-aktif" onchange="prosesFilterData()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white">
+                        <option value="">Semua Status</option>
+                        <option value="sedang pkl">Sedang PKL</option>
+                        <option value="selesai">Selesai</option>
+                        <option value="akan datang">Akan Datang (Masa Depan)</option>
+                    </select>
+                </div>
+                <!-- Filter Universitas -->
                 <div>
                     <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Universitas</label>
                     <select id="filter-univ" onchange="prosesFilterData()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white">
                         <option value="">Semua Universitas</option>
                     </select>
                 </div>
+                <!-- Fitur 3: Filter Penempatan -->
                 <div>
-                    <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Mulai Tanggal (Start Date)</label>
-                    <input type="date" id="filter-date-start" onchange="prosesFilterData()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white">
+                    <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Penempatan</label>
+                    <select id="filter-penempatan" onchange="prosesFilterData()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white">
+                        <option value="">Semua Penempatan</option>
+                    </select>
                 </div>
+                <!-- Fitur 4: Filter Program Studi -->
                 <div>
-                    <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Sampai Tanggal (End Date)</label>
-                    <input type="date" id="filter-date-end" onchange="prosesFilterData()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white">
+                    <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Program Studi</label>
+                    <select id="filter-prodi" onchange="prosesFilterData()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white">
+                        <option value="">Semua Prodi</option>
+                    </select>
                 </div>
             </div>
         </div>
 
+        <!-- Tabel Monitoring Utama -->
         <div class="bg-white shadow rounded-lg border border-slate-200 overflow-hidden">
             <div class="p-5 border-b border-slate-200 bg-slate-50 flex justify-between items-center">
                 <h2 class="text-lg font-bold text-slate-700">Daftar Mahasiswa PKL</h2>
@@ -86,14 +118,14 @@
         </div>
     </div>
 
+    <!-- MODAL POPUP DETAIL MAHASISWA -->
     <div id="modal-detail" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-xl shadow-xl border border-slate-200 max-w-lg w-full overflow-hidden transform transition-all">
             <div class="bg-slate-900 px-6 py-4 flex justify-between items-center">
                 <h3 class="text-lg font-bold text-white">Detail Lengkap Mahasiswa</h3>
                 <button onclick="tutupModal()" class="text-slate-400 hover:text-white font-bold text-xl">&times;</button>
             </div>
-            <div class="p-6 space-y-4" id="modal-content">
-                </div>
+            <div class="p-6 space-y-4" id="modal-content"></div>
             <div class="bg-slate-50 px-6 py-3 flex justify-end">
                 <button onclick="tutupModal()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 text-sm font-semibold rounded-md transition-colors">Tutup</button>
             </div>
@@ -104,20 +136,50 @@
         // MASUKKAN URL GOOGLE APPS SCRIPT ANDA DI SINI
         const WEBA_APP_URL = "https://script.google.com/macros/s/AKfycbwX_iYk6t3h2HjRN0w_eRCbbRTSSIp9XqxNsrpCYndSwP6eESJrHX0mRsirSDv-sV46WQ/exec";
 
-        let dataMentahSistem = []; // Menyimpan data asli dari Sheets
-        let urutanArah = true; // true = Ascending, false = Descending
+        let dataMentahSistem = []; 
+        let urutanArah = true; 
+
+        // Fungsi pembantu konversi ISO Date (seperti di gambar) ke bentuk objek tanggal lokal JavaScript
+        function normalisasiTanggal(inputTgl) {
+            if (!inputTgl) return null;
+            const parsed = Date.parse(inputTgl);
+            if (!isNaN(parsed)) {
+                return new Date(parsed);
+            }
+            const parts = inputTgl.split('/');
+            if (parts.length === 3) {
+                return new Date(parts[2], parts[1] - 1, parts[0]);
+            }
+            return null;
+        }
+
+        // Fungsi mencetak tanggal menjadi format Indonesia yang rapi (dd MMM yyyy)
+        function cetakTanggalIndo(dateObj) {
+            if (!dateObj) return "-";
+            return dateObj.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+        }
 
         async function fetchDashboardData() {
             try {
                 const response = await fetch(WEBA_APP_URL);
-                dataMentahSistem = await response.json();
+                const rawData = await response.json();
                 
-                // Isi Opsi Dropdown Universitas secara unik dinamis
-                isiDropdownUniversitas(dataMentahSistem);
+                // Normalisasi semua format tanggal begitu data diterima dari server
+                dataMentahSistem = rawData.map(item => {
+                    return {
+                        ...item,
+                        objStartDate: normalisasiTanggal(item.startDate),
+                        objEndDate: normalisasiTanggal(item.endDate),
+                        textDisplayStart: cetakTanggalIndo(normalisasiTanggal(item.startDate)),
+                        textDisplayEnd: cetakTanggalIndo(normalisasiTanggal(item.endDate))
+                    };
+                });
+                
+                // Isi semua pilihan dropdown filter secara dinamis berdasarkan isi database Sheets
+                isiDropdownDinamis();
 
-                // Hitung Statistik Utama (Disesuaikan mencari teks "sedang pkl")
-                const totalAktif = dataMentahSistem.filter(item => item.status?.toLowerCase() === 'sedang pkl').length;
-                document.getElementById('stat-aktif').innerText = totalAktif + " Orang";
+                // Hitung data statistik awal
+                hitungStatistikTahun();
 
                 const daftarUniv = [...new Set(dataMentahSistem.map(item => item.universitas))].filter(Boolean);
                 document.getElementById('stat-univ').innerText = daftarUniv.length + " Kampus";
@@ -125,7 +187,6 @@
                 const totalDiterima = dataMentahSistem.filter(item => item.statusPermohonan?.toLowerCase() === 'diterima').length;
                 document.getElementById('stat-diterima').innerText = totalDiterima + " Berkas";
 
-                // Tampilkan data ke tabel
                 prosesFilterData();
 
             } catch (error) {
@@ -136,56 +197,70 @@
             }
         }
 
-        function isiDropdownUniversitas(data) {
-            const selectUniv = document.getElementById('filter-univ');
-            // Reset tapi sisakan opsi pertama
-            selectUniv.innerHTML = '<option value="">Semua Universitas</option>';
-            
-            const daftarUnivUnik = [...new Set(data.map(item => item.universitas))].filter(Boolean).sort();
-            daftarUnivUnik.forEach(univ => {
-                const opt = document.createElement('option');
-                opt.value = univ;
-                opt.innerText = univ;
-                selectUniv.appendChild(opt);
-            });
+        // Fitur 1: Hitung total mahasiswa PKL berdasarkan filter tahun di kartu stat
+        function hitungStatistikTahun() {
+            const tahunPilihan = document.getElementById('stat-year-select').value;
+            let dataTerfilterTahun = dataMentahSistem;
+
+            if (tahunPilihan !== "all") {
+                dataTerfilterTahun = dataMentahSistem.filter(item => {
+                    const tahunStart = item.objStartDate ? item.objStartDate.getFullYear().toString() : "";
+                    const tahunEnd = item.objEndDate ? item.objEndDate.getFullYear().toString() : "";
+                    return tahunStart === tahunPilihan || tahunEnd === tahunPilihan;
+                });
+            }
+
+            const total = dataTerfilterTahun.filter(item => item.status?.toLowerCase() === 'sedang pkl').length;
+            document.getElementById('stat-aktif').innerText = total + " Orang";
         }
 
-        // Fungsi Memproses Kombinasi Pencarian, Filter Universitas, dan Date Range
+        // Otomatisasi Fitur 3 & 4: Membaca keunikan data kolom agar dropdown terisi otomatis
+        function isiDropdownDinamis() {
+            // 1. Dropdown Universitas
+            const selectUniv = document.getElementById('filter-univ');
+            selectUniv.innerHTML = '<option value="">Semua Universitas</option>';
+            const daftarUnivUnik = [...new Set(dataMentahSistem.map(item => item.universitas))].filter(Boolean).sort();
+            daftarUnivUnik.forEach(u => selectUniv.add(new Option(u, u)));
+
+            // 2. Dropdown Penempatan (Fitur 3)
+            const selectPenempatan = document.getElementById('filter-penempatan');
+            selectPenempatan.innerHTML = '<option value="">Semua Penempatan</option>';
+            const daftarPenempatanUnik = [...new Set(dataMentahSistem.map(item => item.penempatan))].filter(Boolean).sort();
+            daftarPenempatanUnik.forEach(p => selectPenempatan.add(new Option(p, p)));
+
+            // 3. Dropdown Prodi (Fitur 4)
+            const selectProdi = document.getElementById('filter-prodi');
+            selectProdi.innerHTML = '<option value="">Semua Prodi</option>';
+            const daftarProdiUnik = [...new Set(dataMentahSistem.map(item => item.prodi))].filter(Boolean).sort();
+            daftarProdiUnik.forEach(pr => selectProdi.add(new Option(pr, pr)));
+        }
+
+        // Eksekusi Pemfilteran Utama Kombinasi
         function prosesFilterData() {
             const kataKunci = document.getElementById('search-input').value.toLowerCase();
             const filterUniv = document.getElementById('filter-univ').value;
-            const tglMulai = document.getElementById('filter-date-start').value;
-            const tglSelesai = document.getElementById('filter-date-end').value;
+            const filterStatusAktif = document.getElementById('filter-status-aktif').value;
+            const filterPenempatan = document.getElementById('filter-penempatan').value;
+            const filterProdi = document.getElementById('filter-prodi').value;
 
             let dataHasilFilter = dataMentahSistem.filter(item => {
-                // 1. Filter Kata Kunci (Nama atau NIM)
                 const cocokKataKunci = item.nama?.toLowerCase().includes(kataKunci) || item.nim?.toString().includes(kataKunci);
-                
-                // 2. Filter Dropdown Universitas
                 const cocokUniv = filterUniv === "" || item.universitas === filterUniv;
+                const cocokPenempatan = filterPenempatan === "" || item.penempatan === filterPenempatan;
+                const cocokProdi = filterProdi === "" || item.prodi === filterProdi;
                 
-                // 3. Filter Date Range berdasarkan rentang waktu PKL
-                let cocokTanggal = true;
-                if (item.startDate) {
-                    // Konversi dd/mm/yyyy ke objek tanggal JS agar bisa dibandingkan
-                    const partTgl = item.startDate.split('/');
-                    const tglItem = new Date(partTgl[2], partTgl[1] - 1, partTgl[0]);
-
-                    if (tglMulai) {
-                        cocokTanggal = cocokTanggal && (tglItem >= new Date(tglMulai));
-                    }
-                    if (tglSelesai) {
-                        cocokTanggal = cocokTanggal && (tglItem <= new Date(tglSelesai));
-                    }
+                // Logika Filter Status Keaktifan (Fitur 2)
+                let cocokStatus = true;
+                if (filterStatusAktif !== "") {
+                    cocokStatus = item.status?.toLowerCase() === filterStatusAktif;
                 }
 
-                return cocokKataKunci && cocokUniv && cocokTanggal;
+                return cocokKataKunci && cocokUniv && cocokPenempatan && cocokProdi && cocokStatus;
             });
 
             renderTabel(dataHasilFilter);
         }
 
-        // Fungsi Sortir/Mengurutkan Kolom Nama atau Universitas
         function urutkanTabel(parameter) {
             urutanArah = !urutanArah;
             dataMentahSistem.sort((a, b) => {
@@ -198,7 +273,6 @@
             prosesFilterData();
         }
 
-        // Tampilkan Baris ke dalam HTML komponen Tabel
         function renderTabel(data) {
             const tbody = document.getElementById('tabel-body-pkl');
             tbody.innerHTML = "";
@@ -208,11 +282,12 @@
                 return;
             }
 
-            data.forEach((mhs, index) => {
-                // Penyesuaian pendeteksian teks status "sedang pkl" untuk warna badge
-                const badgeColor = mhs.status?.toLowerCase() === 'sedang pkl' ? 'bg-green-100 text-green-800' : 'bg-slate-100 text-slate-800';
+            data.forEach((mhs) => {
+                let badgeColor = 'bg-slate-100 text-slate-800';
+                if (mhs.status?.toLowerCase() === 'sedang pkl') badgeColor = 'bg-green-100 text-green-800';
+                else if (mhs.status?.toLowerCase() === 'selesai') badgeColor = 'bg-blue-100 text-blue-800';
+                else if (mhs.status?.toLowerCase() === 'akan datang') badgeColor = 'bg-amber-100 text-amber-800';
 
-                // Membuat element baris tabel
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-indigo-50/50 cursor-pointer transition-colors";
                 tr.onclick = () => bukaModalDetail(mhs);
@@ -230,8 +305,8 @@
                         <div class="text-xs text-slate-400">${mhs.fakultas}</div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-xs text-slate-600">
-                        <div>${mhs.startDate}</div>
-                        <div class="text-slate-400">s/d ${mhs.endDate}</div>
+                        <div>${mhs.textDisplayStart}</div>
+                        <div class="text-slate-400">s/d ${mhs.textDisplayEnd}</div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-slate-700">
                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium bg-blue-50 text-blue-700 border border-blue-100">
@@ -248,7 +323,6 @@
             });
         }
 
-        // Fungsi Menampilkan Modal Detail Mahasiswa saat baris di-klik
         function bukaModalDetail(mhs) {
             const modal = document.getElementById('modal-detail');
             const content = document.getElementById('modal-content');
@@ -282,11 +356,11 @@
                     <div class="col-span-2 border-t border-slate-100 pt-2 grid grid-cols-2 gap-4">
                         <div>
                             <div class="text-xs font-bold text-slate-400 uppercase">Tanggal Mulai</div>
-                            <div class="text-slate-700 font-medium">${mhs.startDate || '-'}</div>
+                            <div class="text-slate-700 font-medium">${mhs.textDisplayStart}</div>
                         </div>
                         <div>
                             <div class="text-xs font-bold text-slate-400 uppercase">Tanggal Selesai</div>
-                            <div class="text-slate-700 font-medium">${mhs.endDate || '-'}</div>
+                            <div class="text-slate-700 font-medium">${mhs.textDisplayEnd}</div>
                         </div>
                     </div>
                     <div class="col-span-2 border-t border-slate-100 pt-2">
@@ -310,10 +384,7 @@
             document.getElementById('modal-detail').classList.add('hidden');
         }
 
-        // Ambil data pertama kali saat web dibuka
         fetchDashboardData();
-
-        // Refresh otomatis dari Google Sheet setiap 30 detik
         setInterval(fetchDashboardData, 30000);
     </script>
 </body>
